@@ -51,7 +51,7 @@ export const createAppointmentAdmin = async (req, res) => {
     // ✅ Correct SQL: placeholders match params
     const sql = `
       INSERT INTO appointments
-      (id, fullName, appointmentDate, startTime, endTime, doctorName, status, createdAt, services, notes, price, email)
+      (id, fullName, appointmentDate, startTime, endTime, doctorName, status, createdAt, service_id, notes, price, email)
       VALUES (?, ?, ?, ?, ?, ?, "Approved by Admin", NOW(), ?, ?, ?, ?)
     `;
 

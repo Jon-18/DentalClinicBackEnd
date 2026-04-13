@@ -61,7 +61,7 @@ export const createAppointment = async (req, res) => {
     // ✅ FIXED SQL (MATCHES PARAMS EXACTLY)
     const sql = `
       INSERT INTO appointments
-      (id, fullName, appointmentDate, startTime, endTime, doctorName, paymentMethod, receiptPath, status, createdAt, contactNumber, email, services, notes, price, user_id)
+      (id, fullName, appointmentDate, startTime, endTime, doctorName, paymentMethod, receiptPath, status, createdAt, contactNumber, email, service_id, notes, price, user_id)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?, ?, ?, ?, ?, ?)
     `;
 

@@ -94,7 +94,7 @@ export const createAppointment = async (req, res) => {
         createdAt,
         contactNumber,
         email,
-        services,
+        service_id,
         notes,
         price
       )
