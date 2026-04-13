@@ -12,8 +12,11 @@ export const getAllAppointments = async (req, res) => {
 
 export const createAppointment = async (req, res) => {
   try {
-    // Parse incoming data (JSON string from FormData or plain JSON)
+    // Parse data
     const data = req.body.data ? JSON.parse(req.body.data) : req.body;
+
+    // FIX: no duplicate id
+    const id = Date.now();
 
     const {
       fullName,
@@ -39,7 +42,7 @@ export const createAppointment = async (req, res) => {
       "contactNumber",
       "email",
       "services",
-      "price"
+      "price",
     ];
 
     for (const field of requiredFields) {
@@ -48,22 +51,24 @@ export const createAppointment = async (req, res) => {
       }
     }
 
-    // Handle receipt file
+    // Receipt
     let receiptUrl = null;
     if (req.file) {
       receiptUrl = `http://localhost:5000/uploadsReceipt/${req.file.filename}`;
     }
 
-    // SQL Insert
+    const status = "Pending";
+    const notes = "Online Booking";
+
+    // FIXED SQL (ALL PLACEHOLDERS MATCH)
     const sql = `
       INSERT INTO appointments
-      (fullName, appointmentDate, startTime, endTime, doctorName, paymentMethod, receiptPath, status, createdAt, contactNumber, email, services, notes, price)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?, ?, ?, "Online Booking", ?)
+      (id, fullName, appointmentDate, startTime, endTime, doctorName, paymentMethod, receiptPath, status, createdAt, contactNumber, email, services, notes, price)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?, ?, ?, ?, ?)
     `;
 
-    const status = "Pending"; // default status
-
     const params = [
+      id,
       fullName,
       date,
       startTime,
@@ -75,21 +80,19 @@ export const createAppointment = async (req, res) => {
       contactNumber,
       email,
       services,
-      price
+      notes,
+      price,
     ];
 
-    const [result] = await pool.query(sql, params);
+    await pool.query(sql, params);
 
-    // Optionally send confirmation email
-    // await sendApprovalEmail(email, fullName, date, startTime, doctorName);
-
-    res.status(201).json({
+    return res.status(201).json({
       message: "Appointment created!",
-      id: result.insertId,
+      id,
       receiptUrl,
     });
   } catch (err) {
     console.error("❌ Error creating appointment:", err);
-    res.status(500).json({ message: "Server error" });
+    return res.status(500).json({ message: "Server error" });
   }
 };
