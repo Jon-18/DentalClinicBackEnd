@@ -30,7 +30,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use(cors({
-  origin: "https://dental-clinic-front-end-git-main-jonathan-esguerras-projects.vercel.app/",
+  origin: "https://dental-clinic-front-end-git-main-jonathan-esguerras-projects.vercel.app",
   credentials: true,
 }));
 
