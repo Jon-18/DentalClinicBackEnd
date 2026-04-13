@@ -4,7 +4,7 @@ import pool from "../db.js";
 export const getProfile = async (req, res) => {
   const { id } = req.params;
 
-  if (Number(req.user.id) !== Number(id)) {
+  if (req.user.id !== id) {
     return res.status(403).json({ message: "Forbidden: not your profile" });
   }
 
@@ -19,7 +19,7 @@ export const getProfile = async (req, res) => {
         address, 
         role
       FROM users WHERE id = ?`,
-      [id]
+      [id],
     );
 
     if (rows.length === 0) {
@@ -27,20 +27,18 @@ export const getProfile = async (req, res) => {
     }
 
     res.status(200).json(rows[0]);
-
   } catch (err) {
     console.error("❌ GET PROFILE ERROR:", err);
     res.status(500).json({ message: "Server error" });
   }
 };
 
-
 // ==================== UPDATE PROFILE ====================
 export const updateProfile = async (req, res) => {
   const { id } = req.params;
   const { fullName, username, email, phone, address } = req.body;
 
-  if (Number(req.user.id) !== Number(id)) {
+  if (eq.user.id !== id) {
     return res.status(403).json({ message: "Forbidden: not your profile" });
   }
 
@@ -49,7 +47,7 @@ export const updateProfile = async (req, res) => {
       `UPDATE users 
         SET fullName = ?, userName = ?, email = ?, phoneNumber = ?, address = ?
        WHERE id = ?`,
-      [fullName, username, email, phone, address, id]
+      [fullName, username, email, phone, address, id],
     );
 
     const [updated] = await pool.query(
@@ -62,14 +60,13 @@ export const updateProfile = async (req, res) => {
         address,
         role
       FROM users WHERE id = ?`,
-      [id]
+      [id],
     );
 
-    res.status(200).json({ 
-      message: "Profile updated successfully", 
-      user: updated[0] 
+    res.status(200).json({
+      message: "Profile updated successfully",
+      user: updated[0],
     });
-
   } catch (err) {
     console.error("❌ UPDATE PROFILE ERROR:", err);
     res.status(500).json({ message: "Server error" });
