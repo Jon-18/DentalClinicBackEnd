@@ -1,41 +1,72 @@
 import dotenv from "dotenv";
 import pool from "../db.js";
+import { v4 as uuidv4 } from "uuid";
 
 dotenv.config();
 
 export const registerDentist = async (req, res) => {
   try {
-    const { name, email, phone, specialization, experience, licenseNumber, address } = req.body;
+    const {
+      name,
+      email,
+      phone,
+      specialization,
+      experience,
+      licenseNumber,
+      address,
+    } = req.body;
 
-    if (!name || !email || !phone || !specialization || !experience || !licenseNumber || !address) {
+    if (
+      !name ||
+      !email ||
+      !phone ||
+      !specialization ||
+      !experience ||
+      !licenseNumber ||
+      !address
+    ) {
       return res.status(400).json({ message: "All fields are required." });
     }
 
-    // Add dentist to dentists table
-    const [dentistResult] = await pool.query(
-      `INSERT INTO dentists (name, email, phone, specialization, experience, licenseNumber, address)
-      VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [name, email, phone, specialization, experience, licenseNumber, address]
-    );
-
-    // Add dentist to users table with role = "doctor"
+    const userId = uuidv4();
+    const dentistId = uuidv4();
     const role = "doctor";
 
-    const [userResult] = await pool.query(
-      `INSERT INTO users (fullName, email, phoneNumber, address, role)
-       VALUES (?, ?, ?, ?, ?)`,
-      [name, email, phone, address, role]
+    // 1. Create user
+    await pool.query(
+      `INSERT INTO users (id, fullName, email, phoneNumber, address, role)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [userId, name, email, phone, address, role],
+    );
+
+    // 2. Create dentist linked to user
+    await pool.query(
+      `INSERT INTO dentists
+       (id, userId, name, email, phone, specialization, experience, licenseNumber, address)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        dentistId,
+        userId,
+        name,
+        email,
+        phone,
+        specialization,
+        experience,
+        licenseNumber,
+        address,
+      ],
     );
 
     return res.status(201).json({
       message: "Dentist registered successfully!",
-      dentistId: dentistResult.insertId,
-      userId: userResult.insertId
+      userId,
+      dentistId,
     });
-
   } catch (error) {
     console.error("Error inserting dentist:", error);
-    return res.status(500).json({ message: "Server error. Please try again later." });
+    return res
+      .status(500)
+      .json({ message: "Server error. Please try again later." });
   }
 };
 
@@ -60,7 +91,7 @@ export const deleteDentist = async (req, res) => {
     // get dentist info first (to match user)
     const [dentist] = await connection.query(
       "SELECT email FROM dentists WHERE id = ?",
-      [id]
+      [id],
     );
 
     if (dentist.length === 0) {
@@ -70,21 +101,14 @@ export const deleteDentist = async (req, res) => {
     const email = dentist[0].email;
 
     // delete from dentists
-    await connection.query(
-      "DELETE FROM dentists WHERE id = ?",
-      [id]
-    );
+    await connection.query("DELETE FROM dentists WHERE id = ?", [id]);
 
     // delete from users (linked by email)
-    await connection.query(
-      "DELETE FROM users WHERE email = ?",
-      [email]
-    );
+    await connection.query("DELETE FROM users WHERE email = ?", [email]);
 
     await connection.commit();
 
     res.status(200).json({ message: "Deleted from both tables" });
-
   } catch (error) {
     await connection.rollback();
     console.error("Transaction error:", error);
@@ -131,7 +155,7 @@ export const updateDentist = async (req, res) => {
     // 🔍 get old email (to update users table correctly)
     const [existing] = await connection.query(
       "SELECT email FROM dentists WHERE id = ?",
-      [id]
+      [id],
     );
 
     if (existing.length === 0) {
@@ -154,7 +178,7 @@ export const updateDentist = async (req, res) => {
         licenseNumber,
         address,
         id,
-      ]
+      ],
     );
 
     // ✅ update users table (match by old email)
@@ -162,7 +186,7 @@ export const updateDentist = async (req, res) => {
       `UPDATE users 
        SET fullName=?, email=?, phoneNumber=?, address=? 
        WHERE email=?`,
-      [name, email, phone, address, oldEmail]
+      [name, email, phone, address, oldEmail],
     );
 
     await connection.commit();

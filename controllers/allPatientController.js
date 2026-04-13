@@ -1,4 +1,5 @@
 import pool from "../db.js";
+import { v4 as uuidv4 } from "uuid";
 
 // 📋 Get all branches
 export const getAllPatient = async (req, res) => {
@@ -18,6 +19,7 @@ export const createAppointmentAdmin = async (req, res) => {
     console.log(req.body);
     // Parse incoming data
     const data = req.body.data ? JSON.parse(req.body.data) : req.body;
+    const id = uuidv4();
 
     const {
       fullName,
@@ -49,11 +51,12 @@ export const createAppointmentAdmin = async (req, res) => {
     // ✅ Correct SQL: placeholders match params
     const sql = `
       INSERT INTO appointments
-      (fullName, appointmentDate, startTime, endTime, doctorName, status, createdAt, services, notes, price, email)
-      VALUES (?, ?, ?, ?, ?, "Approved by Admin", NOW(), ?, ?, ?, ?)
+      (id, fullName, appointmentDate, startTime, endTime, doctorName, status, createdAt, services, notes, price, email)
+      VALUES (?, ?, ?, ?, ?, ?, "Approved by Admin", NOW(), ?, ?, ?, ?)
     `;
 
     const params = [
+      id,
       fullName, // 1st ?
       date, // 2nd ?
       startTime, // 3rd ?

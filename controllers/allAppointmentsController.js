@@ -1,22 +1,35 @@
 import pool from "../db.js";
+import { v4 as uuidv4 } from "uuid";
 
+/**
+ * GET ALL APPOINTMENTS
+ */
 export const getAllAppointments = async (req, res) => {
   try {
     const [rows] = await pool.query("SELECT * FROM appointments");
-    res.status(200).json(rows);
+    return res.status(200).json(rows);
   } catch (err) {
     console.error("Error fetching appointments:", err);
-    res.status(500).json({ message: "Server error" });
+    return res.status(500).json({ message: "Server error" });
   }
 };
 
+/**
+ * CREATE APPOINTMENT
+ */
 export const createAppointment = async (req, res) => {
   try {
-    // Parse data
-    const data = req.body.data ? JSON.parse(req.body.data) : req.body;
+    // Safer body parsing
+    let data = req.body;
+    const id = uuidv4();
 
-    // FIX: no duplicate id
-    const id = Date.now();
+    if (req.body.data) {
+      try {
+        data = JSON.parse(req.body.data);
+      } catch (err) {
+        return res.status(400).json({ message: "Invalid JSON in data field" });
+      }
+    }
 
     const {
       fullName,
@@ -31,7 +44,7 @@ export const createAppointment = async (req, res) => {
       price,
     } = data;
 
-    // Validate required fields
+    // Required fields validation
     const requiredFields = [
       "fullName",
       "date",
@@ -51,19 +64,40 @@ export const createAppointment = async (req, res) => {
       }
     }
 
-    // Receipt
+    // Handle receipt upload
     let receiptUrl = null;
     if (req.file) {
-      receiptUrl = `http://localhost:5000/uploadsReceipt/${req.file.filename}`;
+      const baseUrl = process.env.BASE_URL || "http://localhost:5000";
+      receiptUrl = `${baseUrl}/uploadsReceipt/${req.file.filename}`;
     }
+
+    // Ensure services is stored properly
+    const servicesValue =
+      typeof services === "string" ? services : JSON.stringify(services);
 
     const status = "Pending";
     const notes = "Online Booking";
 
-    // FIXED SQL (ALL PLACEHOLDERS MATCH)
+    // SQL INSERT
     const sql = `
       INSERT INTO appointments
-      (id, fullName, appointmentDate, startTime, endTime, doctorName, paymentMethod, receiptPath, status, createdAt, contactNumber, email, services, notes, price)
+      (
+        id,
+        fullName,
+        appointmentDate,
+        startTime,
+        endTime,
+        doctorName,
+        paymentMethod,
+        receiptPath,
+        status,
+        createdAt,
+        contactNumber,
+        email,
+        services,
+        notes,
+        price
+      )
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?, ?, ?, ?, ?)
     `;
 
@@ -79,7 +113,7 @@ export const createAppointment = async (req, res) => {
       status,
       contactNumber,
       email,
-      services,
+      servicesValue,
       notes,
       price,
     ];
