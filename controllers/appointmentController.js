@@ -52,7 +52,7 @@ export const createAppointment = async (req, res) => {
     // ✅ Handle receipt
     let receiptUrl = null;
     if (req.file) {
-      receiptUrl = `https://dental-clinic-front-end-git-main-jonathan-esguerras-projects.vercel.app/uploadsReceipt/${req.file.filename}`;
+      receiptUrl = `https://dental-clinic-front-end.vercel.app/uploadsReceipt/${req.file.filename}`;
     }
 
     const status = "Pending";

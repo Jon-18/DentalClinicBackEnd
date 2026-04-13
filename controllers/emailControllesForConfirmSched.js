@@ -12,6 +12,14 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+transporter.verify((error, success) => {
+  if (error) {
+    console.error("SMTP ERROR:", error);
+  } else {
+    console.log("SMTP READY");
+  }
+});
+
 export const sendApprovalEmailAdmin = async (appt) => {
   await transporter.sendMail({
     from: "clinicsibongadental@gmail.com",

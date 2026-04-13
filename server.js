@@ -29,14 +29,16 @@ app.use(cookieParser());
 app.use(cors());
 app.use(express.json());
 
-app.use(cors({
-  origin: "https://dental-clinic-front-end-git-main-jonathan-esguerras-projects.vercel.app",
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: "https://dental-clinic-front-end.vercel.app",
+    credentials: true,
+  }),
+);
 
 // ✅ Separate route groups clearly
 app.use("/api/auth", authRoutes);
-app.use("/api/auth", passwordRoutes); 
+app.use("/api/auth", passwordRoutes);
 app.use("/api/patients", patientRoutes);
 app.use("/api/dentists", dentistRoutes);
 app.use("/api/branches", branchRoutes);
@@ -50,12 +52,13 @@ app.use("/api/appointmentDoctor", appointmentDoctor);
 app.use("/api/getAllServices", getAllServices);
 app.use("/api/getAllAppointmentsRoutes", getAllAppointments);
 app.use("/api/getAllPatient", getAllPatient);
-app.use("/api/getAllAppointmentsRoutesPerPatient", getAllAppointmentsPerPatient)
+app.use(
+  "/api/getAllAppointmentsRoutesPerPatient",
+  getAllAppointmentsPerPatient,
+);
 
 app.use("/api/getDataInDashboard", dashboardRoutes);
 app.use("/uploadsReceipt", express.static("uploadsReceipt"));
 
-
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-});
+app.listen(PORT, () => {});
