@@ -4,6 +4,7 @@ import {
   sendApprovalEmailAdmin,
 } from "../controllers/emailControllesForConfirmSched.js";
 import pool from "../db.js";
+import { v4 as uuidv4 } from "uuid";
 
 export const createAppointment = async (req, res) => {
   try {
