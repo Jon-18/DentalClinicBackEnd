@@ -1,4 +1,9 @@
-import { v4 as uuidv4 } from "uuid";
+import {
+  sendApprovalEmail,
+  sendDenialEmail,
+  sendApprovalEmailAdmin,
+} from "../controllers/emailControllesForConfirmSched.js";
+import pool from "../db.js";
 
 export const createAppointment = async (req, res) => {
   try {
@@ -87,5 +92,146 @@ export const createAppointment = async (req, res) => {
   } catch (err) {
     console.error("❌ Error creating appointment:", err);
     return res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const getAppointments = async (req, res) => {
+  try {
+    const sql = `
+      SELECT 
+        *
+      FROM appointments
+      ORDER BY createdAt DESC
+    `;
+
+    const [rows] = await pool.query(sql);
+    res.json(rows);
+  } catch (err) {
+    console.error("❌ Fetch appointments error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const updateAppointment = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const { fullName, date, time, doctorName, paymentMethod, receipt, status } =
+      req.body;
+
+    const sql = `
+      UPDATE appointments
+      SET patientName=?, date=?, time=?, doctorName=?, paymentMethod=?, receiptPath=?, status=?
+      WHERE id=?
+    `;
+
+    const params = [
+      fullName,
+      date,
+      time,
+      doctorName,
+      paymentMethod,
+      receipt,
+      status,
+      id,
+    ];
+
+    await pool.query(sql, params);
+
+    res.json({ message: "Appointment updated" });
+  } catch (err) {
+    console.error("❌ Update error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const updateAppointmentbyAdmin = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status, reason } = req.body;
+
+    // ---------------------------
+    // UPDATE status + reason
+    // ---------------------------
+    const sqlUpdate = `
+      UPDATE appointments
+      SET status=?, note_for_deny=?
+      WHERE id=?
+    `;
+
+    await pool.query(sqlUpdate, [status, reason || null, id]);
+
+    // ---------------------------
+    // FETCH updated appointment
+    // ---------------------------
+    const [rows] = await pool.query(`SELECT * FROM appointments WHERE id=?`, [
+      id,
+    ]);
+
+    const appt = rows[0];
+
+    if (!appt) {
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+
+    if (status === "Approved by Admin") {
+      await sendApprovalEmailAdmin(appt);
+    }
+
+    if (status === "Denied by Admin") {
+      await sendDenialEmail(appt, reason);
+    }
+
+    res.json({ message: "Appointment updated + email sent", appt });
+  } catch (err) {
+    console.error("❌ Admin update error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const updateAppointmentbyDoctor = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    // ---------------------------
+    // UPDATE status first
+    // ---------------------------
+    const sqlUpdate = `
+      UPDATE appointments
+      SET status=?
+      WHERE id=?
+    `;
+
+    await pool.query(sqlUpdate, [status, id]);
+
+    // ---------------------------
+    // FETCH updated appointment (to get email, name, date, doctor, etc.)
+    // ---------------------------
+    const sqlFetch = `
+      SELECT *
+      FROM appointments
+      WHERE id=?
+    `;
+
+    const [rows] = await pool.query(sqlFetch, [id]);
+
+    const appt = rows[0];
+
+    if (!appt) {
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+
+    // ---------------------------
+    // SEND EMAIL ONLY IF APPROVED BY DOCTOR
+    // ---------------------------
+    if (status === "Approved by Doctor") {
+      await sendApprovalEmail(appt);
+    }
+
+    res.json({ message: "Appointment updated", appt });
+  } catch (err) {
+    console.error("❌ Update error:", err);
+    res.status(500).json({ message: "Server error" });
   }
 };
