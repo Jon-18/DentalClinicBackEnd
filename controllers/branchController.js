@@ -1,9 +1,6 @@
 import pool from "../db.js";
 import { v4 as uuidv4 } from "uuid";
 
-// 🏥 Register Branch
-import { v4 as uuidv4 } from "uuid";
-
 export const registerBranch = async (req, res) => {
   try {
     const { name, address, location, schedule } = req.body;
