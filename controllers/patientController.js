@@ -19,16 +19,25 @@ export const registerPatient = async (req, res) => {
 
     // 1. Create user account
     await pool.query(
-      `INSERT INTO users (id, fullName, email, phoneNumber, address, role)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [userId, fullName, email, cellphone, address, role],
+      `INSERT INTO users (id, fullName, email, phoneNumber, role, dateRegister)
+       VALUES (?, ?, ?, ?, ?, ?, NOW())`,
+      [userId, fullName, email, cellphone, role],
     );
 
     // 2. Create patient profile linked to user
     await pool.query(
-      `INSERT INTO patients (id, userId, fullName, dateOfBirth, gender, email, cellphone)
+      `INSERT INTO patients (id, userId, fullName, dateOfBirth, gender, email, cellphone, address)
        VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [patientId, userId, fullName, dateOfBirth, gender, email, cellphone],
+      [
+        patientId,
+        userId,
+        fullName,
+        dateOfBirth,
+        gender,
+        email,
+        cellphone,
+        address,
+      ],
     );
 
     return res.status(201).json({
@@ -136,9 +145,9 @@ export const updatePatient = async (req, res) => {
     // ✅ update users table (match by old email)
     await connection.query(
       `UPDATE users 
-       SET fullName=?, email=?, phoneNumber=?, address=? 
+       SET fullName=?, email=?, phoneNumber=?,
        WHERE email=?`,
-      [fullName, email, cellphone, address, oldEmail],
+      [fullName, email, cellphone, oldEmail],
     );
 
     await connection.commit();
