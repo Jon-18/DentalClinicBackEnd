@@ -14,7 +14,7 @@ const sendResetEmail = async (email, resetLink) => {
     headers: {
       "Content-Type": "application/json",
       "api-key": process.env.BREVO_API_KEY,
-      "accept": "application/json",
+      accept: "application/json",
     },
     body: JSON.stringify({
       sender: {
@@ -42,7 +42,6 @@ const sendResetEmail = async (email, resetLink) => {
   }
 };
 
-
 // =============================
 // 📌 FORGOT PASSWORD
 // =============================
@@ -51,10 +50,9 @@ export const forgotPassword = async (req, res) => {
 
   try {
     console.log("🔹 Checking user email...");
-    const [rows] = await pool.query(
-      "SELECT * FROM users WHERE email = ?",
-      [email]
-    );
+    const [rows] = await pool.query("SELECT * FROM users WHERE email = ?", [
+      email,
+    ]);
 
     if (rows.length === 0) {
       return res.status(404).json({ message: "Email not found." });
@@ -63,19 +61,16 @@ export const forgotPassword = async (req, res) => {
     const user = rows[0];
 
     // Generate 15-min JWT token
-    const token = jwt.sign(
-      { id: user.id },
-      process.env.JWT_SECRET,
-      { expiresIn: "15m" }
-    );
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
+      expiresIn: "15m",
+    });
 
-    const resetLink = `https://clinicsibongaclinic.xyz/reset-password/${token}`;
+    const resetLink = `https://dental-clinic-front-end.vercel.app/reset-password/${token}`;
 
     // Send reset email (NO SMTP)
     await sendResetEmail(email, resetLink);
 
     res.json({ message: "✅ Reset link sent to your email." });
-
   } catch (err) {
     console.error("Forgot Password Error:", err.message);
     res.status(500).json({ message: "⚠️ Server error sending reset link." });
@@ -94,13 +89,12 @@ export const resetPassword = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-    await pool.query(
-      "UPDATE users SET password = ? WHERE id = ?",
-      [hashedPassword, userId]
-    );
+    await pool.query("UPDATE users SET password = ? WHERE id = ?", [
+      hashedPassword,
+      userId,
+    ]);
 
     res.json({ message: "✅ Password reset successful." });
-
   } catch (err) {
     console.error("Reset Password Error:", err);
 
