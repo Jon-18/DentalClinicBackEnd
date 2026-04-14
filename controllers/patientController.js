@@ -20,7 +20,7 @@ export const registerPatient = async (req, res) => {
     // 1. Create user account
     await pool.query(
       `INSERT INTO users (id, fullName, email, phoneNumber, role, dateRegister)
-       VALUES (?, ?, ?, ?, ?, ?, NOW())`,
+       VALUES (?, ?, ?, ?, ?, NOW())`,
       [userId, fullName, email, cellphone, role],
     );
 
