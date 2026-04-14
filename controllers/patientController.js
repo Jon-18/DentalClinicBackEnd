@@ -137,19 +137,18 @@ export const updatePatient = async (req, res) => {
 
     await connection.query(
       `UPDATE patients 
-       SET fullName=?, dateOfBirth=?, gender=?, email=?, cellphone=?, address=?
-       WHERE id=?`,
+      SET fullName=?, dateOfBirth=?, gender=?, email=?, cellphone=?, address=?
+      WHERE id=?`,
       [fullName, dateOfBirth, gender, email, cellphone, address, id],
     );
 
     // ✅ update users table (match by old email)
     await connection.query(
       `UPDATE users 
-       SET fullName=?, email=?, phoneNumber=?,
-       WHERE email=?`,
-      [fullName, email, cellphone, oldEmail],
+      SET fullName=?, email=?, phoneNumber=?, address=?
+      WHERE email=?`,
+      [fullName, email, cellphone, address, oldEmail],
     );
-
     await connection.commit();
 
     return res.status(200).json({
