@@ -27,7 +27,7 @@ export const registerPatient = async (req, res) => {
     // 2. Create patient profile linked to user
     await pool.query(
       `INSERT INTO patients (id, userId, fullName, dateOfBirth, gender, email, cellphone, address)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         patientId,
         userId,
