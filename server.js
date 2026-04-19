@@ -20,6 +20,8 @@ import ProfileUser from "./routes/profileUserRouters.js";
 import serviceRoutes from "./routes/serviceRoutes.js";
 import getUsers from "./routes/userRoutes.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
+import patientHistory from "./routes/appointmentHistory.js";
+import patientHistoryId from "./routes/appointHistoryByUserId.js";
 
 dotenv.config();
 
@@ -52,10 +54,13 @@ app.use("/api/appointmentDoctor", appointmentDoctor);
 app.use("/api/getAllServices", getAllServices);
 app.use("/api/getAllAppointmentsRoutes", getAllAppointments);
 app.use("/api/getAllPatient", getAllPatient);
+app.use("/api/patientHistoryId", patientHistoryId);
+
 app.use(
   "/api/getAllAppointmentsRoutesPerPatient",
   getAllAppointmentsPerPatient,
 );
+app.use("/api/getAppointmentHistory", patientHistory);
 
 app.use("/api/getDataInDashboard", dashboardRoutes);
 app.use("/uploadsReceipt", express.static("uploadsReceipt"));
