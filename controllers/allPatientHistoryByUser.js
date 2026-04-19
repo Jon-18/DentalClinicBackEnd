@@ -12,7 +12,7 @@ export const getAppointmentsByPatientId = async (req, res) => {
       `SELECT *
     FROM appointments
     LEFT JOIN dental_services 
-        ON appointments.services = dental_services.id
+        ON appointments.service_id = dental_services.id
     WHERE appointments.user_id = ?`,
       [user_id],
     );

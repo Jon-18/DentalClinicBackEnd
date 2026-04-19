@@ -3,7 +3,7 @@ import pool from "../db.js";
 export const getAllAppointmentswithServiceName = async (req, res) => {
   try {
     const [rows] = await pool.query(
-      "SELECT * FROM appointments INNER JOIN dental_services ON appointments.services = dental_services.id",
+      "SELECT * FROM appointments INNER JOIN dental_services ON appointments.service_id = dental_services.id",
     );
     return res.status(200).json(rows);
   } catch (err) {
