@@ -18,7 +18,7 @@ export const createAppointmentAdmin = async (req, res) => {
   try {
     console.log(req.body);
     // Parse incoming data
-    const data = req.body.data ? JSON.parse(req.body.data) : req.body;
+    const data = req.body;
     const id = uuidv4();
 
     const {
@@ -57,15 +57,15 @@ export const createAppointmentAdmin = async (req, res) => {
 
     const params = [
       id,
-      fullName, // 1st ?
-      date, // 2nd ?
-      startTime, // 3rd ?
-      endTime, // 4th ?
-      doctorName, // 5th ?
-      services, // 6th ?
-      notes, // 7th ?
-      price, // 8th ?
-      email || null, // 9th ? (allow null if not provided)
+      fullName,
+      date,
+      startTime,
+      endTime,
+      doctorName,
+      services,
+      notes,
+      price,
+      email || null,
     ];
 
     const [result] = await pool.query(sql, params);
