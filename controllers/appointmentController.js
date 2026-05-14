@@ -238,7 +238,7 @@ export const updateAppointmentbyDoctor = async (req, res) => {
         body: JSON.stringify({
           from: "+639517880049",
           to: `+${appt.contactNumber}`,
-          content: `Hi, your Scheduled is confirmed please attende before ${appt.startTime} - ${appt.endTime} .`,
+          content: `Hello! This is Clinic Sibonga Dental. Your appointment has been confirmed. Please arrive before your scheduled time of ${appt.startTime}–${appt.endTime}. Thank you, and we look forward to seeing you.`,
         }),
       });
       console.log("KEY VALUE:", process.env.HTTPSMS_API_KEY);
