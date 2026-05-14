@@ -50,22 +50,42 @@ export const createAppointmentAdmin = async (req, res) => {
 
     // ✅ Correct SQL: placeholders match params
     const sql = `
-      INSERT INTO appointments
-      (id, fullName, appointmentDate, startTime, endTime, doctorName, status, createdAt, service_id, notes, price, email)
-      VALUES (?, ?, ?, ?, ?, ?, "Approved by Admin", NOW(), ?, ?, ?, ?)
-    `;
+  INSERT INTO appointments
+  (
+    id,
+    fullName,
+    contactNumber,
+    email,
+    doctorName,
+    paymentMethod,
+    receiptPath,
+    status,
+    appointmentDate,
+    service_id,
+    startTime,
+    endTime,
+    notes,
+    Price,
+    user_id
+  )
+  VALUES (?, ?, ?, ?, ?, ?, ?, "Approved by Admin", ?, ?, ?, ?, ?, ?, ?)
+`;
 
     const params = [
       id,
       fullName,
+      contactNumber, // REQUIRED (you must add this in frontend)
+      email,
+      doctorName,
+      paymentMethod || null,
+      receiptPath || null,
       date,
+      services,
       startTime,
       endTime,
-      doctorName,
-      services,
       notes,
       price,
-      email || null,
+      user_id || null,
     ];
 
     const [result] = await pool.query(sql, params);
