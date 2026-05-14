@@ -67,7 +67,8 @@ export const createAppointment = async (req, res) => {
     // Handle receipt upload
     let receiptUrl = null;
     if (req.file) {
-      const baseUrl = process.env.BASE_URL || "http://localhost:5000";
+      const baseUrl =
+        process.env.BASE_URL || "https://dentalclinicbackend-1qfr.onrender.com";
       receiptUrl = `${baseUrl}/uploadsReceipt/${req.file.filename}`;
     }
 

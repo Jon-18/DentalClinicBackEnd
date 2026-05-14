@@ -22,6 +22,7 @@ import getUsers from "./routes/userRoutes.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
 import patientHistory from "./routes/appointmentHistory.js";
 import patientHistoryId from "./routes/appointHistoryByUserId.js";
+import paypalRoutes from "./routes/paypalRoutes.js";
 
 dotenv.config();
 
@@ -33,7 +34,7 @@ app.use(express.json());
 
 app.use(
   cors({
-    origin: "https://dental-clinic-front-end.vercel.app",
+    origin: "http://localhost:3000",
     credentials: true,
   }),
 );
@@ -55,6 +56,7 @@ app.use("/api/getAllServices", getAllServices);
 app.use("/api/getAllAppointmentsRoutes", getAllAppointments);
 app.use("/api/getAllPatient", getAllPatient);
 app.use("/api/patientHistoryId", patientHistoryId);
+app.use("/api/paypal", paypalRoutes);
 
 app.use(
   "/api/getAllAppointmentsRoutesPerPatient",

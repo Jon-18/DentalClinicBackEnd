@@ -227,7 +227,25 @@ export const updateAppointmentbyDoctor = async (req, res) => {
     // SEND EMAIL ONLY IF APPROVED BY DOCTOR
     // ---------------------------
     if (status === "Approved by Doctor") {
-      await sendApprovalEmail(appt);
+      // await sendApprovalEmail(appt);
+
+      const response = await fetch("https://api.httpsms.com/v1/messages/send", {
+        method: "POST",
+        headers: {
+          "x-api-key": process.env.HTTPSMS_API_KEY,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          from: "+639517880049",
+          to: `+${appt.contactNumber}`,
+          content: `Hi, your Scheduled is confirmed please attende before ${appt.startTime} - ${appt.endTime} .`,
+        }),
+      });
+      console.log("KEY VALUE:", process.env.HTTPSMS_API_KEY);
+      const data = await response.json();
+
+      console.log("STATUS:", response.status);
+      console.log("RESPONSE:", data);
     }
 
     res.json({ message: "Appointment updated", appt });
