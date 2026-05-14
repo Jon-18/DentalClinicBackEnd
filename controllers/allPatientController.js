@@ -24,6 +24,7 @@ export const createAppointmentAdmin = async (req, res) => {
     const {
       fullName,
       contactNumber,
+      paymentMethod,
       doctorName,
       date,
       startTime,
