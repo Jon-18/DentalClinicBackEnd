@@ -23,6 +23,7 @@ export const createAppointmentAdmin = async (req, res) => {
 
     const {
       fullName,
+      contactNumber,
       doctorName,
       date,
       startTime,
