@@ -27,6 +27,7 @@ export const createAppointmentAdmin = async (req, res) => {
       paymentMethod,
       doctorName,
       date,
+      receiptPath,
       startTime,
       endTime,
       email,
