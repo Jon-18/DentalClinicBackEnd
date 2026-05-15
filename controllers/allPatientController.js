@@ -34,6 +34,7 @@ export const createAppointmentAdmin = async (req, res) => {
       services,
       notes = "Walk-in", // default if not provided
       price,
+      user_id,
     } = data;
 
     // Validate required fields
